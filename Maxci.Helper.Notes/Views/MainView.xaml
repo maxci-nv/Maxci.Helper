@@ -1,0 +1,171 @@
+﻿<Page x:Class="Maxci.Helper.Notes.Views.MainView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="300"
+      Name="root">
+    <Page.Resources>
+        <Style x:Key="popupPanel" TargetType="Popup">
+            <Setter Property="StaysOpen" Value="False" />
+            <Setter Property="AllowsTransparency" Value="True" />
+            <Setter Property="PopupAnimation" Value="Slide" />
+            <Setter Property="Placement" Value="Bottom" />
+            <Setter Property="PlacementTarget" Value="{Binding ElementName=cbGroups}" />
+            <Setter Property="MinWidth" Value="{Binding ActualWidth, ElementName=cbGroups}" />
+            <Setter Property="MaxWidth" Value="{Binding ActualWidth, ElementName=cbGroups}" />
+        </Style>
+        <Style x:Key="placeHolder" TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TextBox}">
+                        <Grid>
+                            <TextBox Text="{Binding Path=Text,
+                                                RelativeSource={RelativeSource TemplatedParent}, 
+                                                Mode=TwoWay,
+                                                UpdateSourceTrigger=PropertyChanged}"
+                                 Padding="{Binding Path=Padding,
+                                           RelativeSource={RelativeSource TemplatedParent}, 
+                                           Mode=TwoWay,
+                                           UpdateSourceTrigger=PropertyChanged}"
+                                 x:Name="textSource" 
+                                 Background="Transparent" 
+                                 Panel.ZIndex="2" />
+                            <TextBox Text="{TemplateBinding Tag}" Background="{TemplateBinding Background}" Panel.ZIndex="1"
+                                     Padding="{Binding Path=Padding,
+                                               RelativeSource={RelativeSource TemplatedParent}, 
+                                               Mode=TwoWay,
+                                               UpdateSourceTrigger=PropertyChanged}">
+                                <TextBox.Style>
+                                    <Style TargetType="{x:Type TextBox}">
+                                        <Setter Property="Foreground" Value="Transparent"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Path=Text, Source={x:Reference textSource}}" Value="">
+                                                <Setter Property="Foreground" Value="LightGray"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Style>
+                            </TextBox>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="Black" />
+            <Setter Property="Padding" Value="5,3" />
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Image.Opacity" Value="0.5" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Page.Resources>
+    <DockPanel Background="#FFEEEEEE">
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Height="25">
+            <Border Grid.Row="0" Grid.Column="0" BorderThickness="1,0,1,0" BorderBrush="DarkGray">
+                <Button  ToolTip="Add note" BorderThickness="0" Command="{Binding AddNoteCommand}">
+                    <Image Source="pack://application:,,,/Maxci.Helper.Notes;component/Resources/Plus.png" />
+                </Button>
+            </Border>
+            <Button Grid.Row="0" Grid.Column="1" ToolTip="Add group" BorderThickness="0" Click="BtnShowNewGroup_Click">
+                <Image Source="pack://application:,,,/Maxci.Helper.Notes;component/Resources/AddFolder.png" />
+            </Button>
+            <Button Grid.Row="0" Grid.Column="2" ToolTip="Remove group" BorderThickness="0" Click="BtnShowRemoveGroup_Click">
+                <Button.Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SelectedItem, ElementName=cbGroups}" Value="{x:Null}">
+                                <Setter Property="IsEnabled" Value="False" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+                <Image Source="pack://application:,,,/Maxci.Helper.Notes;component/Resources/DeleteFolder.png"/>
+            </Button>
+            <Border Grid.Row="0" Grid.Column="3" BorderThickness="1,0,1,0" BorderBrush="DarkGray">
+                <Button ToolTip="Server sync" BorderThickness="0" Command="{Binding SyncNotesCommand}" >
+                    <Image Source="pack://application:,,,/Maxci.Helper.Notes;component/Resources/sync.png" />
+                </Button>
+            </Border>
+        </StackPanel>
+        <ComboBox Name="cbGroups" DockPanel.Dock="Top" IsReadOnly="True"
+                    ItemsSource="{Binding NoteGroups}" SelectedItem="{Binding CurrentGroup}" DisplayMemberPath="Name" />
+        <Popup Name="pNewGroup" Style="{StaticResource popupPanel}">
+            <Border Padding="15,8,15,8" BorderThickness="1" BorderBrush="Gray" Background="#F0F0F0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="25"/>
+                        <ColumnDefinition Width="25"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Name="txtNewGroup" Grid.Column="0" Padding="3"
+                            Style="{StaticResource placeHolder}" Tag="Enter group name" />
+                    <Button Grid.Column="1" ToolTip="Create" Click="BtnHidePopup_Click"
+                        Command="{Binding AddGroupCommand}" CommandParameter="{Binding Text, ElementName=txtNewGroup}">
+                        <Image Source="pack://application:,,,/Maxci.Helper.Notes;component/Resources/ok.png" />
+                    </Button>
+                    <Button Grid.Column="2" ToolTip="Cancel" Click="BtnHidePopup_Click">
+                        <Image Source="pack://application:,,,/Maxci.Helper.Notes;component/Resources/cancel.png"  />
+                    </Button>
+                </Grid>
+            </Border>
+        </Popup>
+        <Popup Name="pQuestionRemoveGroup" Style="{StaticResource popupPanel}">
+            <Border Padding="15,8,15,8" BorderThickness="1" BorderBrush="Gray" Background="#F0F0F0">
+                <StackPanel>
+                    <TextBlock TextWrapping="Wrap" Margin="0,0,0,5">
+                        <Run Text="Do you want to delete the group" />
+                        <LineBreak />
+                        <Run Text="{Binding CurrentGroup.Name, StringFormat='&quot;{0}&quot; ?'}" />
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Content="Yes" Padding="10,3,10,3" Click="BtnHidePopup_Click"
+                                Command="{Binding RemoveGroupCommand}" />
+                        <Button Content="No"  Padding="10,3,10,3" Click="BtnHidePopup_Click" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Popup>
+        <Popup Name="pQuestionRemoveNote" Style="{StaticResource popupPanel}">
+            <Border Padding="15,8,15,8" BorderThickness="1" BorderBrush="Gray" Background="#F0F0F0">
+                <StackPanel>
+                    <TextBlock TextWrapping="Wrap" Margin="0,0,0,5">
+                        <Run Text="Do you want to delete the note" />
+                        <LineBreak />
+                        <Run Text="{Binding CurrentNote.Name, StringFormat='&quot;{0}&quot; ?'}" />
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Content="Yes" Padding="10,3,10,3" Click="BtnHidePopup_Click"
+                                Command="{Binding RemoveNoteCommand}" />
+                        <Button Content="No"  Padding="10,3,10,3" Click="BtnHidePopup_Click" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Popup>
+
+        <ListBox Background="#FFFEFEFE" HorizontalAlignment="Stretch" ItemsSource="{Binding Notes}" DisplayMemberPath="Name"
+                 ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 SelectedItem="{Binding CurrentNote}" SelectionMode="Single">
+            <ListBox.Resources>
+                <Style x:Key="RemoveNote" TargetType="MenuItem">
+                    <EventSetter Event="Click" Handler="CmRemoveNote_Click" />
+                </Style>
+            </ListBox.Resources>
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="ContextMenu">
+                        <Setter.Value>
+                            <ContextMenu>
+                                <MenuItem Header="Remove note" Style="{StaticResource RemoveNote}" />
+                            </ContextMenu>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListBox.ItemContainerStyle>
+        </ListBox>
+    </DockPanel>
+</Page>

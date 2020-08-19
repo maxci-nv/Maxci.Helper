@@ -1,0 +1,73 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\addfolder.png" />
+    <None Remove="Resources\cancel.png" />
+    <None Remove="Resources\deletefolder.png" />
+    <None Remove="Resources\ok.png" />
+    <None Remove="Resources\plus.png" />
+    <None Remove="Resources\refresh.png" />
+    <None Remove="Resources\save.png" />
+    <None Remove="Resources\sync.png" />
+    <None Remove="Resources\sync2.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.0.35" />
+    <PackageReference Include="Microsoft.CodeQuality.Analyzers" Version="3.3.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.mshtml">
+      <HintPath>..\Libs\SmithHtmlEditor\Microsoft.mshtml.dll</HintPath>
+    </Reference>
+    <Reference Include="Smith.WPF.HtmlEditor">
+      <HintPath>..\Libs\SmithHtmlEditor\Smith.WPF.HtmlEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SQLite">
+      <HintPath>..\Libs\Sqlite\System.Data.SQLite.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\addfolder.png" />
+    <Resource Include="Resources\cancel.png" />
+    <Resource Include="Resources\deletefolder.png" />
+    <Resource Include="Resources\ok.png" />
+    <Resource Include="Resources\plus.png" />
+    <Resource Include="Resources\refresh.png" />
+    <Resource Include="Resources\save.png" />
+    <Resource Include="Resources\sync.png" />
+    <Resource Include="Resources\sync2.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="if not exist &quot;$(SolutionDir)\$(SolutionName)\$(OutDir)\Plugins\$(ProjectName)&quot; mkdir &quot;$(SolutionDir)\$(SolutionName)\$(OutDir)\Plugins\$(ProjectName)&quot;&#xD;&#xA;&#xD;&#xA;xcopy /y &quot;$(SolutionDir)Libs\SmithHtmlEditor\smithhtmleditor.stylesheet.css&quot; &quot;$(SolutionDir)\$(SolutionName)\$(OutDir)&quot;&#xD;&#xA;xcopy /y &quot;$(SolutionDir)Libs\SmithHtmlEditor\smithhtmleditor.config.xml&quot; &quot;$(SolutionDir)\$(SolutionName)\$(OutDir)&quot;&#xD;&#xA;xcopy /y /s /e &quot;$(SolutionDir)Libs\SmithHtmlEditor&quot; &quot;$(TargetDir)&quot;&#xD;&#xA;xcopy /y /s /e &quot;$(SolutionDir)Libs\Sqlite&quot; &quot;$(TargetDir)&quot;&#xD;&#xA;&#xD;&#xA;xcopy /y /s /e &quot;$(TargetDir)*&quot; &quot;$(SolutionDir)\$(SolutionName)\$(OutDir)\Plugins\$(ProjectName)&quot;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;" />
+  </Target>
+
+</Project>

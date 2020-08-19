@@ -1,0 +1,62 @@
+﻿<Window x:Class="Maxci.Helper.Views.MainView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Height="450" Width="300" ShowInTaskbar="False" Topmost="True" WindowStyle="None" ResizeMode="NoResize" Name="root">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.Background>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="#FFC1D6F0" Offset="1"/>
+                    <GradientStop Color="#FF8E9EB2"/>
+                </LinearGradientBrush>
+            </Grid.Background>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Width="25" Height="25" Background="{x:Null}" BorderBrush="{x:Null}"
+                    Visibility="{Binding VisiblePlugin, Converter={StaticResource BoolToVisible}}"
+                    Command="{Binding PluginCloseCommand}">
+                <Image Source="/Resources/arrow_left.png" Width="16"/>
+            </Button>
+            <TextBlock Grid.Column="1" Text="{Binding Caption}" VerticalAlignment="Center"
+                       Padding="10,5" FontStyle="Italic" FontWeight="Bold"
+                       MouseLeftButtonDown="TextBlock_MouseLeftButtonDown"/>
+            <ToggleButton Name="btnPushpin" Grid.Column="2" Width="25" Height="25"
+                          Background="{x:Null}" BorderBrush="{x:Null}">
+                <Image Name="ttt" Source="/Resources/pushpin_fill.png"/>
+            </ToggleButton>
+        </Grid>
+        <Border Grid.Row="1" BorderBrush="#FF999999" BorderThickness="1,0,1,1">
+            <ItemsControl Grid.Row="0" ItemsSource="{Binding Plugins}" Margin="0,15">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button HorizontalContentAlignment="Left" VerticalAlignment="Center" 
+                            Padding="20,5" Cursor="Hand" BorderThickness="0" Background="{x:Null}"
+                            Command="{Binding ElementName=root, Path=DataContext.PluginOpenCommand}"
+                            CommandParameter="{Binding}">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Width="24" Height="24" Source="{Binding Icon}" />
+                                <TextBlock Text="{Binding Caption}" VerticalAlignment="Center" Margin="20,0,0,0"
+                                        FontSize="13" FontWeight="Bold" FontFamily="Comic Sans MS" />
+                            </StackPanel>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Border>
+        <Border Grid.Row="1" BorderBrush="#FF999999" BorderThickness="1,0,1,1" Background="#FFEEEEEE"
+                Visibility="{Binding VisiblePlugin, Converter={StaticResource BoolToVisible}}">
+            <Frame NavigationUIVisibility="Hidden"
+                   Content="{Binding ActivePlugin.Page, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        </Border>
+    </Grid>
+</Window>
