@@ -102,8 +102,8 @@
                         <ColumnDefinition Width="25"/>
                         <ColumnDefinition Width="25"/>
                     </Grid.ColumnDefinitions>
-                    <TextBox Name="txtNewGroup" Grid.Column="0" Padding="3"
-                            Style="{StaticResource placeHolder}" Tag="Enter group name" />
+                    <TextBox Name="txtNewGroup" Grid.Column="0" Padding="3" Style="{StaticResource placeHolder}"
+                             Tag="Enter group name" KeyUp="txtNewGroup_KeyUp" />
                     <Button Grid.Column="1" ToolTip="Create" Click="BtnHidePopup_Click"
                         Command="{Binding AddGroupCommand}" CommandParameter="{Binding Text, ElementName=txtNewGroup}">
                         <Image Source="pack://application:,,,/Maxci.Helper.Notes;component/Resources/ok.png" />

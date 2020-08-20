@@ -125,6 +125,20 @@ namespace Maxci.Helper.Notes.Views
             pQuestionRemoveGroup.IsOpen = false;
         }
 
+        private void txtNewGroup_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Enter)
+            {
+                var groupName = txtNewGroup.Text;
+
+                if (_context.AddGroupCommand.CanExecute(groupName))
+                {
+                    _context.AddGroupCommand.Execute(txtNewGroup.Text);
+                    HidePopups();
+                }
+            }
+        }
+
         #endregion
 
     }
