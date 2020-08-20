@@ -10,6 +10,7 @@ using System.ComponentModel;
 namespace Maxci.Helper.UnitTests.Notes.ViewModels
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0017:Упростите инициализацию объекта", Justification = "<Ожидание>")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0062:Сделать локальную функцию статической", Justification = "<Ожидание>")]
     [TestFixture]
     class MainViewModelTests
     {
@@ -360,7 +361,7 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
         }
 
         [Test]
-        public void AddNoteCommand_NoteDidntAddInDB_NoteDidntAdd()
+        public void AddNoteCommand_OpenNoteEditor_CurrentNoteIsNotNullAndNotesDontContainCurrentNote()
         {
             // Arrange
             var group = new NoteGroup { Id = 234 };
@@ -380,31 +381,9 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
 
             // Assert
             Assert.That(viewModel.Notes, Is.Empty);
-            Assert.That(viewModel.CurrentNote, Is.EqualTo(note));
-        }
-
-        [Test]
-        public void AddNoteCommand_NoteAddedInDB_NoteAddedAndSetCurrentNote()
-        {
-            // Arrange
-            var group = new NoteGroup { Id = 234 };
-            var note_new = new Note { Id = 345 };
-
-            var db = Substitute.For<IDbRepository>();
-            db.AddNote(default, group.Id, default, default).ReturnsForAnyArgs(note_new);
-
-            var viewModel = new MainViewModel(db)
-            {
-                CurrentGroup = group
-            };
-
-            // Act
-            viewModel.AddNoteCommand.Execute(default);
-
-            // Assert
-            Assert.That(viewModel.Notes, Is.Not.Empty);
-            Assert.That(viewModel.Notes, Has.Member(note_new));
-            Assert.That(viewModel.CurrentNote, Is.EqualTo(note_new));
+            Assert.That(viewModel.CurrentNote, Is.Not.Null);
+            Assert.That(viewModel.CurrentNote.Id, Is.LessThanOrEqualTo(0));
+            Assert.That(viewModel.CurrentNote.IdGroup, Is.EqualTo(group.Id));
         }
 
         [Test]

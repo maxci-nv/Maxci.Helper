@@ -106,6 +106,7 @@ namespace Maxci.Helper.Notes.ViewModels
 
                     var pos = GetPositionForInsert(note);
                     Plugin.MainViewModel.Notes.Insert(pos, _note);
+                    Plugin.MainViewModel.CurrentNote = _note;
                 }
             }
             else

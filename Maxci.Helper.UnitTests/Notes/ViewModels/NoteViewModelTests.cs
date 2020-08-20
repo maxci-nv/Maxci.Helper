@@ -1,4 +1,5 @@
-﻿using Maxci.Helper.Notes.Models;
+﻿using Maxci.Helper.Notes;
+using Maxci.Helper.Notes.Models;
 using Maxci.Helper.Notes.ViewModels;
 using NSubstitute;
 using NSubstitute.ReceivedExtensions;
@@ -155,18 +156,73 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
         }
 
         [Test]
-        public void SaveCommand_NoteUpdatedInDB_CurrentNoteChanged()
+        public void SaveCommand_NewNoteAndNoteAddedInDB_NoteAddedAndSetCurrentNote()
         {
             // Arrange
+            var noteName = "note_test";
+            var idGroup = 234;
+            var noteText = "234";
+            var noteChanged = new DateTime(2001, 2, 3);
+            var note = new Note { Id = 0, Name = noteName, IdGroup = idGroup, Text = noteText, Changed = noteChanged };
+
+            var db = Substitute.For<IDbRepository>();
+            db.AddNote(Arg.Any<Guid>(), idGroup, noteName, noteText).Returns(note);
+
+            var viewModel = new NoteViewModel(note, db);
+
+            Plugin.MainViewModel = Substitute.For<MainViewModel>(db);
+
+            // Act
+            viewModel.SaveCommand.Execute(default);
+
+            // Assert
+            db.Received(1).AddNote(Arg.Any<Guid>(), idGroup, noteName, noteText);
+
+            Assert.That(note.Changed, Is.Not.EqualTo(noteChanged));
+            Assert.That(viewModel.NoteChanged, Is.Not.EqualTo(noteChanged));
+            Assert.That(Plugin.MainViewModel.Notes, Has.Member(note));
+            Assert.That(Plugin.MainViewModel.CurrentNote, Is.EqualTo(note));
+        }
+
+        [Test]
+        public void SaveCommand_NewNoteAndDidntNoteAddInDB_DidntNoteAdd()
+        {
+            // Arrange
+            var noteName = "note_test";
+            var idGroup = 234;
+            var noteText = "234";
+            var noteChanged = new DateTime(2001, 2, 3);
+            var note = new Note { Id = 0, Name = noteName, IdGroup = idGroup, Text = noteText, Changed = noteChanged };
+
+            var db = Substitute.For<IDbRepository>();
+            db.AddNote(Arg.Any<Guid>(), idGroup, noteName, noteText).Returns((Note)null);
+
+            var viewModel = new NoteViewModel(note, db);
+            
+            Plugin.MainViewModel = Substitute.For<MainViewModel>(db);
+
+            // Act
+            viewModel.SaveCommand.Execute(default);
+
+            // Assert
+            db.Received(1).AddNote(Arg.Any<Guid>(), idGroup, noteName, noteText);
+
+            Assert.That(note.Changed, Is.EqualTo(noteChanged));
+            Assert.That(Plugin.MainViewModel.Notes, Has.No.Member(note));
+        }
+
+        [Test]
+        public void SaveCommand_EditNoteAndNoteUpdatedInDB_CurrentNoteChanged()
+        {
             var noteChangedOld = new DateTime(2001, 2, 3);
             var noteNameNew = "note_test_new";
             var noteTextNew = "note_text_new";
             var note = new Note
-            { 
-                Id = 234, 
+            {
+                Id = 234,
                 IdGroup = 345,
-                Name = "note_test", 
-                Text = "note_text", 
+                Name = "note_test",
+                Text = "note_text",
                 Changed = noteChangedOld
             };
 
@@ -174,6 +230,9 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
             db.UpdateNote(note.Id, note.IdGroup, noteNameNew, noteTextNew).Returns(true);
 
             var viewModel = new NoteViewModel(note, db);
+
+            Plugin.MainViewModel = Substitute.For<MainViewModel>(db);
+            Plugin.MainViewModel.Notes.Add(note);
 
             // Act
             viewModel.NoteName = noteNameNew;
@@ -190,7 +249,7 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
         }
 
         [Test]
-        public void SaveCommand_NoteDidntUpdateInDB_CurrentNoteDidntChange()
+        public void SaveCommand_EditNoteAndNoteDidntUpdateInDB_CurrentNoteDidntChange()
         {
             // Arrange
             var noteChangedOld = new DateTime(2001, 2, 3);
@@ -212,6 +271,9 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
 
             var viewModel = new NoteViewModel(note, db);
 
+            Plugin.MainViewModel = Substitute.For<MainViewModel>(db);
+            Plugin.MainViewModel.Notes.Add(note);
+
             // Act
             viewModel.NoteName = noteNameNew;
             viewModel.NoteText = noteTextNew;
@@ -225,5 +287,6 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
             Assert.That(note.Text, Is.EqualTo(noteTextOld));
             Assert.That(note.Changed, Is.EqualTo(noteChangedOld));
         }
+
     }
 }

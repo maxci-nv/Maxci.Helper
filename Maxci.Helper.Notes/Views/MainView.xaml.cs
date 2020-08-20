@@ -125,7 +125,7 @@ namespace Maxci.Helper.Notes.Views
             pQuestionRemoveGroup.IsOpen = false;
         }
 
-        private void txtNewGroup_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        private void TxtNewGroup_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == System.Windows.Input.Key.Enter)
             {
