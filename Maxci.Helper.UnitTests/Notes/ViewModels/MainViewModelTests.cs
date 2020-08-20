@@ -1,4 +1,5 @@
-﻿using Maxci.Helper.Notes.Models;
+﻿using Maxci.Helper.Notes;
+using Maxci.Helper.Notes.Models;
 using Maxci.Helper.Notes.ViewModels;
 using NSubstitute;
 using NSubstitute.ReceivedExtensions;
@@ -16,28 +17,10 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
         public void Ctor_DBRepositoryIsNull_ThrowException()
         {
             // Arrange
-            var winManager = Substitute.For<IChildWindowManager>();
-            
             // Act
             void action()
             {
-                new MainViewModel(null, winManager);
-            }
-
-            // Assert
-            Assert.That(action, Throws.ArgumentNullException);
-        }
-
-        [Test]
-        public void Ctor_WinManagerIsNull_ThrowException()
-        {
-            // Arrange
-            var db = Substitute.For<IDbRepository>();
-
-            // Act
-            void action()
-            {
-                new MainViewModel(db, null);
+                new MainViewModel(null);
             }
 
             // Assert
@@ -50,13 +33,12 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
             // Arrange
             var group1 = new NoteGroup();
             var group2 = new NoteGroup();
-            var winManager = Substitute.For<IChildWindowManager>();
 
             var db = Substitute.For<IDbRepository>();
             db.GetGroups().Returns(new[] { group1, group2 });
 
             // Act
-            var viewModel = new MainViewModel(db, winManager);
+            var viewModel = new MainViewModel(db);
 
             // Assert
             Assert.That(viewModel.NoteGroups, Has.Count.EqualTo(2));
@@ -74,9 +56,8 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
             var db = Substitute.For<IDbRepository>();
             var group = new NoteGroup();
             var eventHandler = Substitute.For<PropertyChangedEventHandler>();
-            var winManager = Substitute.For<IChildWindowManager>();
 
-            var viewModel = new MainViewModel(db, winManager);
+            var viewModel = new MainViewModel(db);
             viewModel.PropertyChanged += eventHandler;
 
             // Act
@@ -97,12 +78,11 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
             var note1 = new Note { Id = 1};
             var note2 = new Note { Id = 2};
             var note3 = new Note { Id = 3 };
-            var winManager = Substitute.For<IChildWindowManager>();
 
             var db = Substitute.For<IDbRepository>();
             db.GetNotes(group.Id).Returns(new[] { note1, note2 });
 
-            var viewModel = new MainViewModel(db, winManager);
+            var viewModel = new MainViewModel(db);
             viewModel.Notes.Add(note3);
             viewModel.CurrentNote = note3;
 
@@ -122,9 +102,8 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
             var db = Substitute.For<IDbRepository>();
             var note = new Note();
             var eventHandler = Substitute.For<PropertyChangedEventHandler>();
-            var winManager = Substitute.For<IChildWindowManager>();
 
-            var viewModel = new MainViewModel(db, winManager);
+            var viewModel = new MainViewModel(db);
             viewModel.PropertyChanged += eventHandler;
 
             // Act
@@ -143,14 +122,15 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
             // Arrange
             var db = Substitute.For<IDbRepository>();
             var note = new Note();
-            var winManager = Substitute.For<IChildWindowManager>();
-            var viewModel = new MainViewModel(db, winManager);
+            var viewModel = new MainViewModel(db);
+
+            Plugin.WinManager = Substitute.For<IChildWindowManager>();
 
             // Act
             viewModel.CurrentNote = note;
 
             // Assert
-            winManager.Received(1).ShowNoteView(note);
+            Plugin.WinManager.Received(1).ShowNoteView(note);
         }
 
         [TestCase(null)]
@@ -160,8 +140,7 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
         {
             // Arrange
             var db = Substitute.For<IDbRepository>();
-            var winManager = Substitute.For<IChildWindowManager>();
-            var viewModel = new MainViewModel(db, winManager);
+            var viewModel = new MainViewModel(db);
 
             // Act
             var result = viewModel.AddGroupCommand.CanExecute(param);
@@ -180,12 +159,11 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
                 Id = 234,
                 Name = "group_new",
             };
-            var winManager = Substitute.For<IChildWindowManager>();
 
             var db = Substitute.For<IDbRepository>();
             db.AddGroup(Arg.Any<Guid>(), group_new.Name).Returns(group_new);
 
-            var viewModel = new MainViewModel(db, winManager)
+            var viewModel = new MainViewModel(db)
             {
                 CurrentGroup = group_old
             };
@@ -206,12 +184,11 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
             // Arrange
             var groupName = "group_new";
             var group_old = new NoteGroup();
-            var winManager = Substitute.For<IChildWindowManager>();
 
             var db = Substitute.For<IDbRepository>();
             db.AddGroup(Arg.Any<Guid>(), groupName).Returns((NoteGroup)null);
 
-            var viewModel = new MainViewModel(db, winManager)
+            var viewModel = new MainViewModel(db)
             {
                 CurrentGroup = group_old
             };
@@ -231,8 +208,7 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
         {
             // Arrange
             var db = Substitute.For<IDbRepository>();
-            var winManager = Substitute.For<IChildWindowManager>();
-            var viewModel = new MainViewModel(db, winManager)
+            var viewModel = new MainViewModel(db)
             {
                 CurrentGroup = null
             };
@@ -249,12 +225,11 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
         {
             // Arrange
             var group = new NoteGroup { Id = 234, Name = "group_text" };
-            var winManager = Substitute.For<IChildWindowManager>();
 
             var db = Substitute.For<IDbRepository>();
             db.RemoveGroup(group.Id).Returns(true);
 
-            var viewModel = new MainViewModel(db, winManager);
+            var viewModel = new MainViewModel(db);
             viewModel.NoteGroups.Add(group);
 
             // Act
@@ -269,12 +244,11 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
         {
             // Arrange
             var group = new NoteGroup { Id = 234, Name = "group_text" };
-            var winManager = Substitute.For<IChildWindowManager>();
 
             var db = Substitute.For<IDbRepository>();
             db.RemoveGroup(group.Id).Returns(true);
 
-            var viewModel = new MainViewModel(db, winManager);
+            var viewModel = new MainViewModel(db);
             viewModel.NoteGroups.Add(group);
             viewModel.CurrentGroup = group;
 
@@ -290,12 +264,11 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
         {
             // Arrange
             var group = new NoteGroup { Id = 234, Name = "group_text" };
-            var winManager = Substitute.For<IChildWindowManager>();
 
             var db = Substitute.For<IDbRepository>();
             db.RemoveGroup(group.Id).Returns(false);
 
-            var viewModel = new MainViewModel(db, winManager);
+            var viewModel = new MainViewModel(db);
             viewModel.NoteGroups.Add(group);
             viewModel.CurrentGroup = group;
 
@@ -311,12 +284,11 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
         {
             // Arrange
             var group = new NoteGroup { Id = 234, Name = "group_text" };
-            var winManager = Substitute.For<IChildWindowManager>();
 
             var db = Substitute.For<IDbRepository>();
             db.RemoveGroup(group.Id).Returns(true);
 
-            var viewModel = new MainViewModel(db, winManager);
+            var viewModel = new MainViewModel(db);
             viewModel.NoteGroups.Add(group);
             viewModel.CurrentGroup = group;
 
@@ -335,12 +307,11 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
             var group1 = new NoteGroup { Id = 2341, Name = "group_text1" };
             var group2 = new NoteGroup { Id = 2342, Name = "group_text2" };
             var group3 = new NoteGroup { Id = 2343, Name = "group_text3" };
-            var winManager = Substitute.For<IChildWindowManager>();
 
             var db = Substitute.For<IDbRepository>();
             db.RemoveGroup(group3.Id).Returns(true);
 
-            var viewModel = new MainViewModel(db, winManager);
+            var viewModel = new MainViewModel(db);
             viewModel.NoteGroups.Add(group1);
             viewModel.NoteGroups.Add(group2);
             viewModel.NoteGroups.Add(group3);
@@ -359,8 +330,7 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
         {
             // Arrange
             var db = Substitute.For<IDbRepository>();
-            var winManager = Substitute.For<IChildWindowManager>();
-            var viewModel = new MainViewModel(db, winManager)
+            var viewModel = new MainViewModel(db)
             {
                 CurrentGroup = null
             };
@@ -376,9 +346,8 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
         public void AddNoteCommand_CurrentGroupInvalid_DontThrowExceptionAndDontCallAddNoteInDB()
         {
             // Arrange
-            var winManager = Substitute.For<IChildWindowManager>();
             var db = Substitute.For<IDbRepository>();
-            var viewModel = new MainViewModel(db, winManager)
+            var viewModel = new MainViewModel(db)
             {
                 CurrentGroup = null
             };
@@ -396,12 +365,11 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
             // Arrange
             var group = new NoteGroup { Id = 234 };
             var note = new Note { Id = 345 };
-            var winManager = Substitute.For<IChildWindowManager>();
 
             var db = Substitute.For<IDbRepository>();
             db.AddNote(default, group.Id, default, default).ReturnsForAnyArgs((Note)null);
 
-            var viewModel = new MainViewModel(db, winManager)
+            var viewModel = new MainViewModel(db)
             {
                 CurrentGroup = group,
                 CurrentNote = note
@@ -420,13 +388,12 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
         {
             // Arrange
             var group = new NoteGroup { Id = 234 };
-            var winManager = Substitute.For<IChildWindowManager>();
             var note_new = new Note { Id = 345 };
 
             var db = Substitute.For<IDbRepository>();
             db.AddNote(default, group.Id, default, default).ReturnsForAnyArgs(note_new);
 
-            var viewModel = new MainViewModel(db, winManager)
+            var viewModel = new MainViewModel(db)
             {
                 CurrentGroup = group
             };
@@ -445,8 +412,7 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
         {
             // Arrange
             var db = Substitute.For<IDbRepository>();
-            var winManager = Substitute.For<IChildWindowManager>();
-            var viewModel = new MainViewModel(db, winManager)
+            var viewModel = new MainViewModel(db)
             {
                 CurrentGroup = null
             };
@@ -464,9 +430,8 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
             // Arrange
             var note = new Note { Id = 234 };
             var db = Substitute.For<IDbRepository>();
-            var winManager = Substitute.For<IChildWindowManager>();
 
-            var viewModel = new MainViewModel(db, winManager);
+            var viewModel = new MainViewModel(db);
             viewModel.Notes.Add(note);
             viewModel.CurrentNote = null;
 
@@ -485,12 +450,11 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
         {
             // Arrange
             var note = new Note { Id = 234 };
-            var winManager = Substitute.For<IChildWindowManager>();
 
             var db = Substitute.For<IDbRepository>();
             db.RemoveNote(note.Id).Returns(false);
 
-            var viewModel = new MainViewModel(db, winManager);
+            var viewModel = new MainViewModel(db);
             viewModel.Notes.Add(note);
             viewModel.CurrentNote = note;
 
@@ -508,12 +472,11 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
             // Arrange
             var note1 = new Note { Id = 2341 };
             var note2 = new Note { Id = 2342 };
-            var winManager = Substitute.For<IChildWindowManager>();
 
             var db = Substitute.For<IDbRepository>();
             db.RemoveNote(note1.Id).Returns(true);
 
-            var viewModel = new MainViewModel(db, winManager);
+            var viewModel = new MainViewModel(db);
             viewModel.Notes.Add(note1);
             viewModel.Notes.Add(note2);
             viewModel.CurrentNote = note1;

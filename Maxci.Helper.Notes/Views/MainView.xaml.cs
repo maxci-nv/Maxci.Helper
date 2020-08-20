@@ -1,5 +1,4 @@
-﻿using Maxci.Helper.Notes.Models;
-using Maxci.Helper.Notes.Models.Impl;
+﻿using Maxci.Helper.Notes.Models.Impl;
 using Maxci.Helper.Notes.ViewModels;
 using System;
 using System.Windows;
@@ -14,14 +13,12 @@ namespace Maxci.Helper.Notes.Views
     public partial class MainView : Page
     {
         private readonly MainViewModel _context;
-        private readonly IChildWindowManager _winManager;
 
         public MainView()
         {
             InitializeComponent();
 
-            _winManager = new ChildWindowManager();
-            _context = new MainViewModel(new DbRepository(), _winManager);
+            _context = new MainViewModel(new DbRepository());
 
             DataContext = _context;
 
@@ -70,7 +67,7 @@ namespace Maxci.Helper.Notes.Views
 
         private void MainView_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            var window = _winManager?.ChildWindow;
+            var window = Plugin.WinManager?.ChildWindow;
 
             if (window == null)
                 return;

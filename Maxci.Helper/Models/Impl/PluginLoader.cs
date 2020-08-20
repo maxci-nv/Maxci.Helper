@@ -45,16 +45,16 @@ namespace Maxci.Helper.Models.Impl
             try
             {
                 var ns = assembly.GetName().Name;
-                var type = assembly.ExportedTypes.FirstOrDefault(t => t.FullName == $"{ns}.Views.MainView");
+                var type = assembly.ExportedTypes.FirstOrDefault(t => t.FullName == $"{ns}.Plugin");
+                var methodCreate = type?.GetMethod("Create");
 
-                if (type == null)
+                if (methodCreate == null)
                     return null;
 
                 var plugin = new Plugin
                 {
-                    Page = Activator.CreateInstance(type) as Page
+                    Page = methodCreate.Invoke(null, null) as Page
                 };
-
                 
                 using var stream = assembly.GetManifestResourceStream($"{ns}.Resources.resources");
                 using var reader = new DeserializingResourceReader(stream);

@@ -1,8 +1,6 @@
 ﻿using Maxci.Helper.Notes.Models;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 
@@ -13,7 +11,6 @@ namespace Maxci.Helper.Notes.ViewModels
     /// </summary>
     class MainViewModel : BaseViewModel
     {
-        private readonly IChildWindowManager _winManager;
         private readonly IDbRepository _db;
         private NoteGroup _currentGroup;
         private Note _currentNote;
@@ -61,17 +58,16 @@ namespace Maxci.Helper.Notes.ViewModels
                     _currentNote = value;
                     OnPropertyChanged();
 
-                    _winManager.ShowNoteView(value);
+                    Plugin.WinManager?.ShowNoteView(value);
                 }
             }
         }
 
 
 
-        public MainViewModel(IDbRepository db, IChildWindowManager windowManager)
+        public MainViewModel(IDbRepository db)
         {
             _db = db ?? throw new ArgumentNullException(nameof(db));
-            _winManager = windowManager ?? throw new ArgumentNullException(nameof(windowManager));
 
             NoteGroups = new ObservableCollection<NoteGroup>();
             Notes = new ObservableCollection<Note>();
@@ -190,16 +186,16 @@ namespace Maxci.Helper.Notes.ViewModels
             if (idGroup <= 0)
                 return;
 
-            var nameNote = "New note";
-            var textNote = "";
-            var guidNote = Guid.NewGuid();
-            var note = _db.AddNote(guidNote, idGroup, nameNote, textNote);
-
-            if (note != null)
+            var note = new Note
             {
-                Notes.Add(note);
-                CurrentNote = note;
-            }
+                Id = 0,
+                IdGroup = idGroup,
+                Name = "",
+                Text = "",
+                Changed = DateTime.Now
+            };
+
+            CurrentNote = note;
         }, obj => _currentGroup != null));
 
 
