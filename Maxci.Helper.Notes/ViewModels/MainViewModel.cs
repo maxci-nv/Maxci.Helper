@@ -195,7 +195,8 @@ namespace Maxci.Helper.Notes.ViewModels
                 Changed = DateTime.Now
             };
 
-            CurrentNote = note;
+            CurrentNote = null;
+            Plugin.WinManager?.ShowNoteView(note);
         }, obj => _currentGroup != null));
 
 
@@ -223,7 +224,7 @@ namespace Maxci.Helper.Notes.ViewModels
         public ICommand SyncNotesCommand => _syncNotesCommand ?? (_syncNotesCommand = new RelayCommand(obj =>
         {
             CurrentNote = null;
-            Plugin.WinManager.ShowSyncView();
+            Plugin.WinManager?.ShowSyncView();
         }));
         
         #endregion

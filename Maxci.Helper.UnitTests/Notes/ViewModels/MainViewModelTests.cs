@@ -361,14 +361,17 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
         }
 
         [Test]
-        public void AddNoteCommand_OpenNoteEditor_CurrentNoteIsNotNullAndNotesDontContainCurrentNote()
+        public void AddNoteCommand_OpenNoteEditor_CurrentNoteIsNullAndNotesDontContainCurrentNote()
         {
             // Arrange
             var group = new NoteGroup { Id = 234 };
             var note = new Note { Id = 345 };
+            var winManager = Substitute.For<IChildWindowManager>();
 
             var db = Substitute.For<IDbRepository>();
             db.AddNote(default, group.Id, default, default).ReturnsForAnyArgs((Note)null);
+
+            Plugin.WinManager = winManager;
 
             var viewModel = new MainViewModel(db)
             {
@@ -381,9 +384,9 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
 
             // Assert
             Assert.That(viewModel.Notes, Is.Empty);
-            Assert.That(viewModel.CurrentNote, Is.Not.Null);
-            Assert.That(viewModel.CurrentNote.Id, Is.LessThanOrEqualTo(0));
-            Assert.That(viewModel.CurrentNote.IdGroup, Is.EqualTo(group.Id));
+            Assert.That(viewModel.CurrentNote, Is.Null);
+
+            winManager.Received(1).ShowNoteView(Arg.Is<Note>(z => z.Id <= 0));
         }
 
         [Test]
@@ -467,6 +470,28 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
             Assert.That(viewModel.Notes, Has.Count.EqualTo(1));
             Assert.That(viewModel.Notes, Has.Member(note2));
             Assert.That(viewModel.CurrentNote, Is.Null);
+        }
+
+        [Test]
+        public void SyncNotesCommand_OpenWindow_ShowSyncViewAndCurrentNoteIsNull()
+        {
+            // Arrange
+            var note1 = new Note { Id = 2341 };
+            var db = Substitute.For<IDbRepository>();
+            var winManager = Substitute.For<IChildWindowManager>();
+
+            Plugin.WinManager = winManager;
+
+            var viewModel = new MainViewModel(db);
+            viewModel.Notes.Add(note1);
+            viewModel.CurrentNote = note1;
+
+            // Act
+            viewModel.SyncNotesCommand.Execute(default);
+
+            // Assert
+            Assert.That(viewModel.CurrentNote, Is.Null);
+            winManager.Received(1).ShowSyncView();
         }
     }
 }
