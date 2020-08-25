@@ -222,10 +222,8 @@ namespace Maxci.Helper.Notes.ViewModels
         private ICommand _syncNotesCommand;
         public ICommand SyncNotesCommand => _syncNotesCommand ?? (_syncNotesCommand = new RelayCommand(obj =>
         {
-            MessageBox.Show("NotImplemented");
-            
-            //CurrentNote = null;
-            //_winManager.ShowSyncView();
+            CurrentNote = null;
+            Plugin.WinManager.ShowSyncView();
         }));
         
         #endregion

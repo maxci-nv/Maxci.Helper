@@ -1,5 +1,4 @@
 ﻿using Maxci.Helper.Notes.Models;
-using Maxci.Helper.Notes.Models.Impl;
 using Maxci.Helper.Notes.ViewModels;
 using System;
 using System.Windows;
@@ -11,8 +10,6 @@ namespace Maxci.Helper.Notes.Views
     /// </summary>
     public partial class SyncView : Window
     {
-        internal IChildWindowManager WinManager { get; set; }
-
         public SyncView()
         {
             InitializeComponent();
@@ -44,7 +41,7 @@ namespace Maxci.Helper.Notes.Views
 
         private void BtnClose_Click(object sender, RoutedEventArgs e)
         {
-            WinManager?.CloseChildWindows();
+            Plugin.WinManager?.CloseChildWindows();
         }
 
 

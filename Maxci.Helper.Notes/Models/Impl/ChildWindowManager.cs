@@ -46,7 +46,7 @@ namespace Maxci.Helper.Notes.Models.Impl
             {
                 CloseChildWindows();
 
-                ChildWindow = new SyncView() { WinManager = this };
+                ChildWindow = new SyncView();
                 ChildWindow.Show();
             }
             else

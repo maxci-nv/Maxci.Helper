@@ -3,13 +3,13 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:ex="clr-namespace:Smith.WPF.HtmlEditor;assembly=Smith.WPF.HtmlEditor" 
         mc:Ignorable="d"
-        d:DesignHeight="450" Width="600" Height="300"
+        d:DesignHeight="450" Width="800" Height="300"
         ResizeMode="NoResize" ShowInTaskbar="False" WindowStyle="None" Topmost="True">
     <Border BorderBrush="#FF999999" BorderThickness="1">
         <Grid>
             <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
                 <RowDefinition />
             </Grid.RowDefinitions>
@@ -23,50 +23,57 @@
                 <Button Grid.Column="1" Padding="10,3" TabIndex="2" ToolTip="Close" BorderThickness="0" Background="#CCCCCC"
                         Content="Х" Click="BtnClose_Click"/>
             </Grid>
-            <TabControl Grid.Row="1">
-                <TabItem Header="Groups" Margin="0,0,0,0">
-                    <DockPanel>
-                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                            <Button Grid.Column="0" ToolTip="Refresh">
-                                <Image MaxHeight="16" Source="pack://application:,,,/Maxci.Helper.Notes;component/Resources/refresh.png" />
-                            </Button>
-                            <Button Grid.Column="1" ToolTip="Sync">
-                                <Image MaxHeight="16" Source="pack://application:,,,/Maxci.Helper.Notes;component/Resources/sync2.png" />
-                            </Button>
-                        </StackPanel>
-                        <DataGrid VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Hidden">
-                            <DataGrid.Columns>
-                                <DataGridCheckBoxColumn Width="25" />
-                                <DataGridTextColumn Header="Guid" Width="188"/>
-                                <DataGridTextColumn Header="Name" Width="250"/>
-                                <DataGridTextColumn Header="Comparison result" Width="110"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </DockPanel>
-                </TabItem>
-                <TabItem Header="Notes" Margin="0,0,0,0">
-                    <DockPanel>
-                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                            <Button Grid.Column="0" ToolTip="Refresh">
-                                <Image MaxHeight="16" Source="pack://application:,,,/Maxci.Helper.Notes;component/Resources/refresh.png" />
-                            </Button>
-                            <Button Grid.Column="1" ToolTip="Sync">
-                                <Image MaxHeight="16" Source="pack://application:,,,/Maxci.Helper.Notes;component/Resources/sync2.png" />
-                            </Button>
-                            <TextBlock Text="Group" Margin="120,0,15,0" VerticalAlignment="Center"/>
-                            <ComboBox Width="250" />
-                        </StackPanel>
-                        <DataGrid VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Hidden">
-                            <DataGrid.Columns>
-                                <DataGridCheckBoxColumn Width="25" />
-                                <DataGridTextColumn Header="Guid" Width="188"/>
-                                <DataGridTextColumn Header="Name" Width="250"/>
-                                <DataGridTextColumn Header="Comparison result" Width="110"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </DockPanel>
-                </TabItem>
-            </TabControl>
+
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="10" VerticalAlignment="Center">
+                <TextBlock Text="Server URL" Margin="0,0,15,0" VerticalAlignment="Center" />
+                <TextBox Text="{Binding ServerURL}" Width="300" Padding="5"/>
+                <Button ToolTip="Save" Width="25" Command="{Binding SaveConfigCommand}">
+                    <Image MaxHeight="16" Source="pack://application:,,,/Maxci.Helper.Notes;component/Resources/save.png" />
+                </Button>
+            </StackPanel>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal">
+                <TabControl Width="250">
+                    <TabItem Header="Groups" Margin="0,0,0,0">
+                        <DockPanel>
+                            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                                <Button Grid.Column="0" ToolTip="Refresh">
+                                    <Image MaxHeight="16" Source="pack://application:,,,/Maxci.Helper.Notes;component/Resources/refresh.png" />
+                                </Button>
+                            </StackPanel>
+                            <DataGrid VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Hidden">
+                                <DataGrid.Columns>
+                                    <DataGridCheckBoxColumn Width="25" />
+                                    <DataGridTextColumn Header="Name" Width="350"/>
+                                    <DataGridTextColumn Header="Comparison result" Width="200"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DockPanel>
+                    </TabItem>
+                </TabControl>
+
+                <TabControl Width="547">
+                    <TabItem Header="Notes" Margin="0,0,0,0">
+                        <DockPanel>
+                            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                                <Button Grid.Column="0" ToolTip="Refresh">
+                                    <Image MaxHeight="16" Source="pack://application:,,,/Maxci.Helper.Notes;component/Resources/refresh.png" />
+                                </Button>
+                                <Button Grid.Column="1" ToolTip="Sync">
+                                    <Image MaxHeight="16" Source="pack://application:,,,/Maxci.Helper.Notes;component/Resources/sync2.png" />
+                                </Button>
+                            </StackPanel>
+                            <DataGrid VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Hidden">
+                                <DataGrid.Columns>
+                                    <DataGridCheckBoxColumn Width="25" />
+                                    <DataGridTextColumn Header="Name" Width="250"/>
+                                    <DataGridTextColumn Header="Comparison result" Width="110"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DockPanel>
+                    </TabItem>
+                </TabControl>
+            </StackPanel>
         </Grid>
     </Border>
 </Window>
