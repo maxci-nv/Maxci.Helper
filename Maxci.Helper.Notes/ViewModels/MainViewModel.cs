@@ -66,7 +66,7 @@ namespace Maxci.Helper.Notes.ViewModels
         }
 
         [Import]
-        public ChildWindowManager WinManager { get; set; }
+        public IChildWindowManager WinManager { get; set; }
 
         public MainViewModel(IDbRepository db)
         {

@@ -6,19 +6,13 @@ using System.Windows;
 namespace Maxci.Helper.Notes.Views
 {
     /// <summary>
-    /// Child windows manager
+    /// Child window manager
     /// </summary>
 
-    public class ChildWindowManager
+    public class ChildWindowManager: IChildWindowManager
     {
-        /// <summary>
-        /// The child window
-        /// </summary>
         public Window ChildWindow { get; private set; }
 
-        /// <summary>
-        /// Close all child windows
-        /// </summary>
         public void CloseChildWindows()
         {
             if (ChildWindow != null)
@@ -28,10 +22,6 @@ namespace Maxci.Helper.Notes.Views
             }
         }
 
-        /// <summary>
-        /// Show a view for the note
-        /// </summary>
-        /// <param name="note">Note</param>
         public void ShowNoteView(Note note)
         {
             if (note == null)
@@ -53,9 +43,6 @@ namespace Maxci.Helper.Notes.Views
             }
         }
 
-        /// <summary>
-        /// Show a view for synchronization
-        /// </summary>
         public void ShowSyncView()
         {
             var childWindow = ChildWindow;

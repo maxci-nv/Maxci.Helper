@@ -1,7 +1,6 @@
 ﻿using Maxci.Helper.Notes.Entities;
 using Maxci.Helper.Notes.Repositories;
 using System;
-using System.Collections;
 using System.Windows.Input;
 
 namespace Maxci.Helper.Notes.ViewModels
@@ -17,8 +16,11 @@ namespace Maxci.Helper.Notes.ViewModels
         private string _noteName;
         private string _noteText;
         private DateTime? _noteChanged;
-        private bool _isNew;
 
+        /// <summary>
+        /// Is new note?
+        /// </summary>
+        public bool IsNew { get; private set; }
 
         /// <summary>
         /// Note name
@@ -71,17 +73,17 @@ namespace Maxci.Helper.Notes.ViewModels
 
         public NoteViewModel(Note note, IDbRepository db, MainViewModel mainViewModel)
         {
-            _mainViewModel = mainViewModel;
+            _mainViewModel = mainViewModel ?? throw new ArgumentNullException(nameof(mainViewModel));
             _note = note ?? throw new ArgumentNullException(nameof(note));
             _db = db ?? throw new ArgumentNullException(nameof(db));
 
             if (note != null)
             {
-                _isNew = (note.Id <= 0);
+                IsNew = (note.Id <= 0);
 
                 NoteName = note.Name;
                 NoteText = note.Text;
-                NoteChanged = _isNew ? (DateTime?)null : note.Changed;
+                NoteChanged = IsNew ? (DateTime?)null : note.Changed;
             }
         }
 
@@ -92,7 +94,7 @@ namespace Maxci.Helper.Notes.ViewModels
         private ICommand _saveCommand;
         public ICommand SaveCommand => _saveCommand ?? (_saveCommand = new RelayCommand(obj =>
         {
-            if (_isNew)
+            if (IsNew)
             {
                 var note = _db.AddNote(Guid.NewGuid(), _note.IdGroup, _noteName, _noteText);
 
@@ -104,8 +106,7 @@ namespace Maxci.Helper.Notes.ViewModels
                     _note.Changed = DateTime.UtcNow;
 
                     NoteChanged = _note.Changed;
-
-                    _isNew = false;
+                    IsNew = false;
 
                     var pos = GetPositionForInsert(note);
                     _mainViewModel.Notes.Insert(pos, _note);

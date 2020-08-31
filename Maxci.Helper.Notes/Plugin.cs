@@ -42,7 +42,7 @@ namespace Maxci.Helper.Notes
             container.Configure(z =>
             {
                 z.ExportInstance(configuration);
-                z.ExportInstance(new ChildWindowManager());
+                z.ExportInstance<IChildWindowManager>(new ChildWindowManager());
                 z.ExportAs<DbRepository, IDbRepository>();
                 z.ExportAs<ServerRepository, IServerRepository>();
 
