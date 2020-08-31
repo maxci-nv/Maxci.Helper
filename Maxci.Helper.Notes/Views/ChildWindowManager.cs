@@ -1,13 +1,24 @@
-﻿using Maxci.Helper.Notes.ViewModels;
-using Maxci.Helper.Notes.Views;
+﻿using Maxci.Helper.Notes.Entities;
+using Maxci.Helper.Notes.Repositories;
+using Maxci.Helper.Notes.ViewModels;
 using System.Windows;
 
-namespace Maxci.Helper.Notes.Models.Impl
+namespace Maxci.Helper.Notes.Views
 {
-    class ChildWindowManager : IChildWindowManager
+    /// <summary>
+    /// Child windows manager
+    /// </summary>
+
+    public class ChildWindowManager
     {
+        /// <summary>
+        /// The child window
+        /// </summary>
         public Window ChildWindow { get; private set; }
-        
+
+        /// <summary>
+        /// Close all child windows
+        /// </summary>
         public void CloseChildWindows()
         {
             if (ChildWindow != null)
@@ -17,6 +28,10 @@ namespace Maxci.Helper.Notes.Models.Impl
             }
         }
 
+        /// <summary>
+        /// Show a view for the note
+        /// </summary>
+        /// <param name="note">Note</param>
         public void ShowNoteView(Note note)
         {
             if (note == null)
@@ -32,12 +47,15 @@ namespace Maxci.Helper.Notes.Models.Impl
                 if (ChildWindow == null)
                     ChildWindow = new NoteView(note);
                 else if (ChildWindow is NoteView)
-                    ChildWindow.DataContext = new NoteViewModel(note, new DbRepository());
+                    ChildWindow.DataContext = new NoteViewModel(note, new DbRepository(), null);
 
                 ChildWindow.Show();
             }
         }
 
+        /// <summary>
+        /// Show a view for synchronization
+        /// </summary>
         public void ShowSyncView()
         {
             var childWindow = ChildWindow;
@@ -46,11 +64,12 @@ namespace Maxci.Helper.Notes.Models.Impl
             {
                 CloseChildWindows();
 
-                ChildWindow = new SyncView();
+                ChildWindow = new SyncView(null);
                 ChildWindow.Show();
             }
             else
                 childWindow.Show();
         }
+
     }
 }

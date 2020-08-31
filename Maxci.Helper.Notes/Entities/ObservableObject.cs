@@ -1,12 +1,9 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace Maxci.Helper.Notes.ViewModels
+namespace Maxci.Helper.Notes.Entities
 {
-    /// <summary>
-    /// Common class for ViewModels
-    /// </summary>
-    abstract class BaseViewModel : INotifyPropertyChanged
+    public abstract class ObservableObject: INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

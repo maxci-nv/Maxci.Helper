@@ -1,6 +1,7 @@
-﻿using Maxci.Helper.Notes.Models;
+﻿using Maxci.Helper.Notes.Entities;
+using Maxci.Helper.Notes.Repositories;
 using System;
-using System.Windows;
+using System.Collections;
 using System.Windows.Input;
 
 namespace Maxci.Helper.Notes.ViewModels
@@ -8,8 +9,9 @@ namespace Maxci.Helper.Notes.ViewModels
     /// <summary>
     /// ViewModel for NoteView.xaml
     /// </summary>
-    class NoteViewModel : BaseViewModel
+    class NoteViewModel : ObservableObject
     {
+        private readonly MainViewModel _mainViewModel;
         private readonly IDbRepository _db;
         private readonly Note _note;
         private string _noteName;
@@ -67,8 +69,9 @@ namespace Maxci.Helper.Notes.ViewModels
         }
 
 
-        public NoteViewModel(Note note, IDbRepository db)
+        public NoteViewModel(Note note, IDbRepository db, MainViewModel mainViewModel)
         {
+            _mainViewModel = mainViewModel;
             _note = note ?? throw new ArgumentNullException(nameof(note));
             _db = db ?? throw new ArgumentNullException(nameof(db));
 
@@ -105,8 +108,8 @@ namespace Maxci.Helper.Notes.ViewModels
                     _isNew = false;
 
                     var pos = GetPositionForInsert(note);
-                    Plugin.MainViewModel.Notes.Insert(pos, _note);
-                    Plugin.MainViewModel.CurrentNote = _note;
+                    _mainViewModel.Notes.Insert(pos, _note);
+                    _mainViewModel.CurrentNote = _note;
                 }
             }
             else
@@ -118,7 +121,7 @@ namespace Maxci.Helper.Notes.ViewModels
                     if (isRename)
                     {
                         var indexNew = GetPositionForInsert(new Note { Name = _noteName });
-                        var notes = Plugin.MainViewModel.Notes;
+                        var notes = _mainViewModel.Notes;
                         var indexOld = notes.IndexOf(_note);
 
                         if (indexNew > indexOld)
@@ -149,7 +152,7 @@ namespace Maxci.Helper.Notes.ViewModels
         /// <returns>Position index</returns>
         private int GetPositionForInsert(Note note)
         {
-            var notes = Plugin.MainViewModel.Notes;
+            var notes = _mainViewModel.Notes;
             var count = notes.Count;
 
             if (count == 0)

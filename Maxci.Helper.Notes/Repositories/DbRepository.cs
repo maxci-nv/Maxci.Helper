@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Maxci.Helper.Notes.Entities;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -7,7 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Maxci.Helper.Notes.Models.Impl
+namespace Maxci.Helper.Notes.Repositories
 {
     class DbRepository : IDbRepository
     {

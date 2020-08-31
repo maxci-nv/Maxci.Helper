@@ -1,5 +1,7 @@
-﻿using Maxci.Helper.Notes.Models;
+﻿using Grace.DependencyInjection.Attributes;
+using Maxci.Helper.Notes.Repositories;
 using Maxci.Helper.Notes.ViewModels;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Windows;
 
@@ -10,7 +12,10 @@ namespace Maxci.Helper.Notes.Views
     /// </summary>
     public partial class SyncView : Window
     {
-        public SyncView()
+        [Import]
+        public ChildWindowManager WinManager { get; set; }
+
+        public SyncView(IConfiguration configuration)
         {
             InitializeComponent();
             RefreshLocation();
@@ -24,7 +29,7 @@ namespace Maxci.Helper.Notes.Views
                 mainView.StateChanged += MainView_LocationChanged;
             }
 
-            DataContext = new SyncViewModel();
+            DataContext = new SyncViewModel(configuration, new ServerRepository(), new DbRepository());
         }
 
         protected override void OnClosed(EventArgs e)
@@ -41,7 +46,7 @@ namespace Maxci.Helper.Notes.Views
 
         private void BtnClose_Click(object sender, RoutedEventArgs e)
         {
-            Plugin.WinManager?.CloseChildWindows();
+            WinManager?.CloseChildWindows();
         }
 
 

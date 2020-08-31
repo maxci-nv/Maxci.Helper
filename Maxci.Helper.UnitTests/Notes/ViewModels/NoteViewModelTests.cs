@@ -1,5 +1,6 @@
 ﻿using Maxci.Helper.Notes;
-using Maxci.Helper.Notes.Models;
+using Maxci.Helper.Notes.Entities;
+using Maxci.Helper.Notes.Repositories;
 using Maxci.Helper.Notes.ViewModels;
 using NSubstitute;
 using NSubstitute.ReceivedExtensions;
@@ -21,8 +22,9 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
             var db = Substitute.For<IDbRepository>();
             var note = new Note();
             var eventHandler = Substitute.For<PropertyChangedEventHandler>();
+            var mainViewModel = Substitute.For<MainViewModel>(db);
 
-            var viewModel = new NoteViewModel(note, db);
+            var viewModel = new NoteViewModel(note, db, mainViewModel);
             viewModel.PropertyChanged += eventHandler;
 
             // Act
@@ -43,8 +45,9 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
             var db = Substitute.For<IDbRepository>();
             var note = new Note();
             var eventHandler = Substitute.For<PropertyChangedEventHandler>();
+            var mainViewModel = Substitute.For<MainViewModel>(db);
 
-            var viewModel = new NoteViewModel(note, db);
+            var viewModel = new NoteViewModel(note, db, mainViewModel);
             viewModel.PropertyChanged += eventHandler;
 
             // Act
@@ -65,8 +68,9 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
             var db = Substitute.For<IDbRepository>();
             var note = new Note();
             var eventHandler = Substitute.For<PropertyChangedEventHandler>();
+            var mainViewModel = Substitute.For<MainViewModel>(db);
 
-            var viewModel = new NoteViewModel(note, db);
+            var viewModel = new NoteViewModel(note, db, mainViewModel);
             viewModel.PropertyChanged += eventHandler;
 
             // Act
@@ -95,9 +99,10 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
                 Name = noteName,
                 Text = noteText
             };
+            var mainViewModel = Substitute.For<MainViewModel>(db);
 
             // Act
-            var viewModel = new NoteViewModel(note, db);
+            var viewModel = new NoteViewModel(note, db, mainViewModel);
 
             // Assert
             Assert.That(viewModel.NoteName, Is.EqualTo(noteName));
@@ -110,11 +115,12 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
         {
             // Arrange
             var db = Substitute.For<IDbRepository>();
+            var mainViewModel = Substitute.For<MainViewModel>(db);
 
             // Act
             void action()
             {
-                var viewModel = new NoteViewModel(null, db);
+                var viewModel = new NoteViewModel(null, db, mainViewModel);
             };
 
             // Assert
@@ -126,11 +132,13 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
         {
             // Arrange
             var note = new Note();
+            var db = Substitute.For<IDbRepository>();
+            var mainViewModel = Substitute.For<MainViewModel>(db);
 
             // Act
             void action()
             {
-                var viewModel = new NoteViewModel(note, null);
+                var viewModel = new NoteViewModel(note, null, mainViewModel);
             };
 
             // Assert
@@ -143,7 +151,8 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
             // Arrange
             var db = Substitute.For<IDbRepository>();
             var note = new Note { Id = 234, Name = "note_test" };
-            var viewModel = new NoteViewModel(note, db)
+            var mainViewModel = Substitute.For<MainViewModel>(db);
+            var viewModel = new NoteViewModel(note, db, mainViewModel)
             {
                 NoteName = ""
             };
@@ -168,9 +177,8 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
             var db = Substitute.For<IDbRepository>();
             db.AddNote(Arg.Any<Guid>(), idGroup, noteName, noteText).Returns(note);
 
-            var viewModel = new NoteViewModel(note, db);
-
-            Plugin.MainViewModel = Substitute.For<MainViewModel>(db);
+            var mainViewModel = Substitute.For<MainViewModel>(db);
+            var viewModel = new NoteViewModel(note, db, mainViewModel);
 
             // Act
             viewModel.SaveCommand.Execute(default);
@@ -180,8 +188,8 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
 
             Assert.That(note.Changed, Is.Not.EqualTo(noteChanged));
             Assert.That(viewModel.NoteChanged, Is.Not.EqualTo(noteChanged));
-            Assert.That(Plugin.MainViewModel.Notes, Has.Member(note));
-            Assert.That(Plugin.MainViewModel.CurrentNote, Is.EqualTo(note));
+            Assert.That(mainViewModel.Notes, Has.Member(note));
+            Assert.That(mainViewModel.CurrentNote, Is.EqualTo(note));
         }
 
         [Test]
@@ -197,10 +205,9 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
             var db = Substitute.For<IDbRepository>();
             db.AddNote(Arg.Any<Guid>(), idGroup, noteName, noteText).Returns((Note)null);
 
-            var viewModel = new NoteViewModel(note, db);
+            var mainViewModel = Substitute.For<MainViewModel>(db);
+            var viewModel = new NoteViewModel(note, db, mainViewModel);
             
-            Plugin.MainViewModel = Substitute.For<MainViewModel>(db);
-
             // Act
             viewModel.SaveCommand.Execute(default);
 
@@ -208,7 +215,7 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
             db.Received(1).AddNote(Arg.Any<Guid>(), idGroup, noteName, noteText);
 
             Assert.That(note.Changed, Is.EqualTo(noteChanged));
-            Assert.That(Plugin.MainViewModel.Notes, Has.No.Member(note));
+            Assert.That(mainViewModel.Notes, Has.No.Member(note));
         }
 
         [Test]
@@ -229,10 +236,10 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
             var db = Substitute.For<IDbRepository>();
             db.UpdateNote(note.Id, note.IdGroup, noteNameNew, noteTextNew).Returns(true);
 
-            var viewModel = new NoteViewModel(note, db);
+            var mainViewModel = Substitute.For<MainViewModel>(db);
+            mainViewModel.Notes.Add(note);
 
-            Plugin.MainViewModel = Substitute.For<MainViewModel>(db);
-            Plugin.MainViewModel.Notes.Add(note);
+            var viewModel = new NoteViewModel(note, db, mainViewModel);
 
             // Act
             viewModel.NoteName = noteNameNew;
@@ -269,10 +276,10 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
             var db = Substitute.For<IDbRepository>();
             db.UpdateNote(note.Id, note.IdGroup, noteNameNew, noteTextNew).Returns(false);
 
-            var viewModel = new NoteViewModel(note, db);
+            var mainViewModel = Substitute.For<MainViewModel>(db);
+            mainViewModel.Notes.Add(note);
 
-            Plugin.MainViewModel = Substitute.For<MainViewModel>(db);
-            Plugin.MainViewModel.Notes.Add(note);
+            var viewModel = new NoteViewModel(note, db, mainViewModel);
 
             // Act
             viewModel.NoteName = noteNameNew;

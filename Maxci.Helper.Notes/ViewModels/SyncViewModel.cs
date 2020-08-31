@@ -1,12 +1,11 @@
-﻿using Maxci.Helper.Notes.Models;
+﻿using Maxci.Helper.Notes.Entities;
+using Maxci.Helper.Notes.Repositories;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.IO.Enumeration;
 using System.Reflection;
-using System.Text.Json;
 using System.Windows.Input;
 
 namespace Maxci.Helper.Notes.ViewModels
@@ -14,9 +13,11 @@ namespace Maxci.Helper.Notes.ViewModels
     /// <summary>
     /// ViewModel for SyncView.xaml
     /// </summary>
-    class SyncViewModel : BaseViewModel
+    class SyncViewModel : ObservableObject
     {
-        private string _serverUrl;
+        private readonly IConfiguration _configuration;
+        private readonly IServerRepository _server;
+        private readonly IDbRepository _db;
 
         /// <summary>
         /// List of note groups
@@ -33,26 +34,49 @@ namespace Maxci.Helper.Notes.ViewModels
         /// </summary>
         public string ServerURL 
         {
-            get => _serverUrl;
+            get => _server.ServerURL;
             set
             {
-                if (_serverUrl != value)
+                if (_server.ServerURL != value)
                 {
-                    _serverUrl = value;
+                    _server.ServerURL = value;
                     OnPropertyChanged();
                 }
             }
         }
 
-        public SyncViewModel()
+        public SyncViewModel(IConfiguration configuration, IServerRepository server, IDbRepository db)
         {
             Groups = new ObservableCollection<NoteGroup>();
             Notes = new ObservableCollection<Note>();
 
-            _serverUrl = Plugin.Config?["AppSettings:ServerURL"];
+            _configuration = configuration;
+            _server = server;
+            _db = db;
 
-            if (string.IsNullOrWhiteSpace(_serverUrl))
-                _serverUrl = "http:\\\\127.0.0.1";
+            if (_server != null)
+            {
+                var serverUrl = _configuration["AppSettings:ServerURL"];
+
+                if (string.IsNullOrWhiteSpace(serverUrl))
+                    serverUrl = "http:\\\\127.0.0.1";
+
+                _server.ServerURL = serverUrl;
+            }
+
+            InitGroups();
+        }
+
+
+        private void InitGroups()
+        {
+            //var groups_client = _db.GetGroupsForSync();
+            //var groups_server = _server.GetGroups();
+            //var groups_result = new SortedSet();
+            //
+            //var t = groups_server.Union(groups_client);
+
+            
 
         }
 
@@ -63,7 +87,7 @@ namespace Maxci.Helper.Notes.ViewModels
         private ICommand _saveConfigCommand;
         public ICommand SaveConfigCommand => _saveConfigCommand ?? (_saveConfigCommand = new RelayCommand(obj =>
         {
-            AddOrUpdateConfig("AppSettings:ServerURL", _serverUrl);
+            AddOrUpdateConfig("AppSettings:ServerURL", _server.ServerURL);
         }));
         private bool AddOrUpdateConfig<T>(string key, T value)
         {
@@ -90,15 +114,15 @@ namespace Maxci.Helper.Notes.ViewModels
                         jsonObj = jsonObj[section];
                     }
 
-                    if (jsonObj[keys[keys.Length - 1]] == null)
-                        jsonObj[keys[keys.Length - 1]] = new JValue(value);
+                    if (jsonObj[keys[^1]] == null)
+                        jsonObj[keys[^1]] = new JValue(value);
                     else
-                        ((JValue)jsonObj[keys[keys.Length - 1]]).Value = value;
+                        ((JValue)jsonObj[keys[^1]]).Value = value;
 
                     var output = JsonConvert.SerializeObject(jsonDocument, Formatting.Indented);
                     File.WriteAllText(filename, output);
 
-                    Plugin.Config[key] = _serverUrl;
+                    _configuration[key] = value?.ToString();
                 }
 
                 return true;

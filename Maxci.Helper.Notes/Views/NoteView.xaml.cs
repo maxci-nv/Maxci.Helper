@@ -1,5 +1,5 @@
-﻿using Maxci.Helper.Notes.Models;
-using Maxci.Helper.Notes.Models.Impl;
+﻿using Maxci.Helper.Notes.Entities;
+using Maxci.Helper.Notes.Repositories;
 using Maxci.Helper.Notes.ViewModels;
 using System;
 using System.Windows;
@@ -28,7 +28,7 @@ namespace Maxci.Helper.Notes.Views
                 mainView.StateChanged += MainView_LocationChanged;
             }
 
-            DataContext = new NoteViewModel(note, new DbRepository());
+            DataContext = new NoteViewModel(note, new DbRepository(), null);
         }
 
         protected override void OnClosed(EventArgs e)

@@ -1,7 +1,9 @@
-﻿using Maxci.Helper.Notes.Models;
+﻿using Grace.DependencyInjection.Attributes;
+using Maxci.Helper.Notes.Entities;
+using Maxci.Helper.Notes.Repositories;
+using Maxci.Helper.Notes.Views;
 using System;
 using System.Collections.ObjectModel;
-using System.Windows;
 using System.Windows.Input;
 
 namespace Maxci.Helper.Notes.ViewModels
@@ -9,7 +11,7 @@ namespace Maxci.Helper.Notes.ViewModels
     /// <summary>
     /// ViewModel for MainView.xaml
     /// </summary>
-    class MainViewModel : BaseViewModel
+    class MainViewModel : ObservableObject
     {
         private readonly IDbRepository _db;
         private NoteGroup _currentGroup;
@@ -58,12 +60,13 @@ namespace Maxci.Helper.Notes.ViewModels
                     _currentNote = value;
                     OnPropertyChanged();
 
-                    Plugin.WinManager?.ShowNoteView(value);
+                    WinManager?.ShowNoteView(value);
                 }
             }
         }
 
-
+        [Import]
+        public ChildWindowManager WinManager { get; set; }
 
         public MainViewModel(IDbRepository db)
         {
@@ -196,7 +199,7 @@ namespace Maxci.Helper.Notes.ViewModels
             };
 
             CurrentNote = null;
-            Plugin.WinManager?.ShowNoteView(note);
+            WinManager?.ShowNoteView(note);
         }, obj => _currentGroup != null));
 
 
@@ -224,7 +227,7 @@ namespace Maxci.Helper.Notes.ViewModels
         public ICommand SyncNotesCommand => _syncNotesCommand ?? (_syncNotesCommand = new RelayCommand(obj =>
         {
             CurrentNote = null;
-            Plugin.WinManager?.ShowSyncView();
+            WinManager?.ShowSyncView();
         }));
         
         #endregion

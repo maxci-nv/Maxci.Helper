@@ -1,4 +1,4 @@
-﻿using Maxci.Helper.Notes.Models.Impl;
+﻿using Grace.DependencyInjection.Attributes;
 using Maxci.Helper.Notes.ViewModels;
 using System;
 using System.Windows;
@@ -12,15 +12,12 @@ namespace Maxci.Helper.Notes.Views
     /// </summary>
     public partial class MainView : Page
     {
-        private readonly MainViewModel _context;
+        [Import]
+        public ChildWindowManager WinManager { get; set; }
 
         public MainView()
         {
             InitializeComponent();
-
-            _context = new MainViewModel(new DbRepository());
-
-            DataContext = _context;
 
             IsVisibleChanged += MainView_IsVisibleChanged;
             Loaded += MainView_Loaded;
@@ -67,7 +64,7 @@ namespace Maxci.Helper.Notes.Views
 
         private void MainView_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            var window = Plugin.WinManager?.ChildWindow;
+            var window = WinManager?.ChildWindow;
 
             if (window == null)
                 return;
@@ -130,10 +127,11 @@ namespace Maxci.Helper.Notes.Views
             if (e.Key == System.Windows.Input.Key.Enter)
             {
                 var groupName = txtNewGroup.Text;
+                var context = (MainViewModel)DataContext;
 
-                if (_context.AddGroupCommand.CanExecute(groupName))
+                if (context.AddGroupCommand.CanExecute(groupName))
                 {
-                    _context.AddGroupCommand.Execute(txtNewGroup.Text);
+                    context.AddGroupCommand.Execute(txtNewGroup.Text);
                     HidePopups();
                 }
             }

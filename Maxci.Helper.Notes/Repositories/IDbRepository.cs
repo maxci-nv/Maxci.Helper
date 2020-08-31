@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Maxci.Helper.Notes.Entities;
+using System;
 using System.Collections.Generic;
 
-namespace Maxci.Helper.Notes.Models
+namespace Maxci.Helper.Notes.Repositories
 {
     /// <summary>
     /// Interface for database

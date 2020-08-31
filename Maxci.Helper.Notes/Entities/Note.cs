@@ -1,14 +1,17 @@
 ﻿using System;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 
-namespace Maxci.Helper.Notes.Models
+namespace Maxci.Helper.Notes.Entities
 {
     /// <summary>
     /// Entity "Note" 
     /// </summary>
-    class Note : INotifyPropertyChanged
+    public class Note : ObservableObject
     {
+        private long _idGroup;
+        private string _name;
+        private string _text;
+        private DateTime _changed;
+
         /// <summary>
         /// Note ID
         /// </summary>
@@ -17,7 +20,6 @@ namespace Maxci.Helper.Notes.Models
         /// <summary>
         /// Note group ID
         /// </summary>
-        private long _idGroup;
         public long IdGroup
         {
             get => _idGroup;
@@ -34,7 +36,6 @@ namespace Maxci.Helper.Notes.Models
         /// <summary>
         /// Note name
         /// </summary>
-        private string _name;
         public string Name
         {
             get => _name;
@@ -51,7 +52,6 @@ namespace Maxci.Helper.Notes.Models
         /// <summary>
         /// Note text
         /// </summary>
-        private string _text;
         public string Text 
         {
             get => _text;
@@ -68,7 +68,6 @@ namespace Maxci.Helper.Notes.Models
         /// <summary>
         /// When the note is changed
         /// </summary>
-        private DateTime _changed;
         public DateTime Changed
         {
             get => _changed;
@@ -80,14 +79,6 @@ namespace Maxci.Helper.Notes.Models
                     OnPropertyChanged();
                 }
             }
-        }
-
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
     }

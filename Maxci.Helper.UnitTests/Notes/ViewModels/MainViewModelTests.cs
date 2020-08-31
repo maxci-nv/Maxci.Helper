@@ -1,6 +1,8 @@
 ﻿using Maxci.Helper.Notes;
-using Maxci.Helper.Notes.Models;
+using Maxci.Helper.Notes.Entities;
+using Maxci.Helper.Notes.Repositories;
 using Maxci.Helper.Notes.ViewModels;
+using Maxci.Helper.Notes.Views;
 using NSubstitute;
 using NSubstitute.ReceivedExtensions;
 using NUnit.Framework;
@@ -123,15 +125,17 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
             // Arrange
             var db = Substitute.For<IDbRepository>();
             var note = new Note();
-            var viewModel = new MainViewModel(db);
-
-            Plugin.WinManager = Substitute.For<IChildWindowManager>();
+            var winManager = Substitute.For<ChildWindowManager>();
+            var viewModel = new MainViewModel(db)
+            {
+                WinManager = winManager
+            };
 
             // Act
             viewModel.CurrentNote = note;
 
             // Assert
-            Plugin.WinManager.Received(1).ShowNoteView(note);
+            winManager.Received(1).ShowNoteView(note);
         }
 
         [TestCase(null)]
@@ -366,17 +370,16 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
             // Arrange
             var group = new NoteGroup { Id = 234 };
             var note = new Note { Id = 345 };
-            var winManager = Substitute.For<IChildWindowManager>();
+            var winManager = Substitute.For<ChildWindowManager>();
 
             var db = Substitute.For<IDbRepository>();
             db.AddNote(default, group.Id, default, default).ReturnsForAnyArgs((Note)null);
 
-            Plugin.WinManager = winManager;
-
             var viewModel = new MainViewModel(db)
             {
                 CurrentGroup = group,
-                CurrentNote = note
+                CurrentNote = note,
+                WinManager = winManager,
             };
 
             // Act
@@ -478,11 +481,10 @@ namespace Maxci.Helper.UnitTests.Notes.ViewModels
             // Arrange
             var note1 = new Note { Id = 2341 };
             var db = Substitute.For<IDbRepository>();
-            var winManager = Substitute.For<IChildWindowManager>();
-
-            Plugin.WinManager = winManager;
+            var winManager = Substitute.For<ChildWindowManager>();
 
             var viewModel = new MainViewModel(db);
+            viewModel.WinManager = winManager;
             viewModel.Notes.Add(note1);
             viewModel.CurrentNote = note1;
 
